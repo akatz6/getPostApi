@@ -179,7 +179,7 @@ class StoreControllerTest extends TestCase
         $this->assertEquals(count($array), 3);
     }
 
-    //   //test
+    //test
     public function test_get_posts_title_equal_to_alphabet_and_conter_equal_to_a_b()
     {
         $response = $this->post('/store', ['id' => "abc", 'title' => "Alphabet", 
@@ -207,4 +207,31 @@ class StoreControllerTest extends TestCase
         
         $this->assertEquals(count($array), 3);
     }
+
+        //test
+        public function test_get_posts_title_equal_to_alphabet_or_conter_equal_to_a_b()
+        {
+            $response = $this->post('/store', ['id' => "abc3", 'title' => "Alphabet", 
+            "content" => 'A,B,C',  "views" => 28]);
+            $response = $this->post('/store', ['id' => "ab33", 'title' => "Alphabet", 
+            "content" => 'A,B,C',  "views" => 18]);
+            $response = $this->post('/store', ['id' => "ab3323", 'title' => "Alphabet", 
+            "content" => 'A,B',  "views" => 18]);
+            $response = $this->post('/store', ['id' => "axb33", 'title' => "Alphabet", 
+            "content" => 'A,B',  "views" => 15]);
+            $response = $this->post('/store', ['id' => "a3", 'title' => "Alphabet", 
+            "content" => 'A,B,Z',  "views" => 0]);
+            $response = $this->post('/store', ['id' => "one", 'title' => "This Two", 
+            "content" => 'A,B',  "views" => 18]);
+            $response = $this->post('/store', ['id' => "abc", 'title' => "No longer alphabet", 
+            "content" => 'A,B,C',  "views" => 30]);
+    
+            $post = Post::count();
+            $this->assertEquals($post, 7);
+    
+            $responses = $this->get('/store?query=OR(EQUAL(title, "Alphabet"),EQUAL(content, "A,B") )');
+            $array = json_decode($responses->content());
+            
+            $this->assertEquals(count($array), 6);
+        }
 }

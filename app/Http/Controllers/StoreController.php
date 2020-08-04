@@ -54,6 +54,7 @@ class StoreController extends Controller
         $params = $this->refineParams("NOT", "/\bNOT".$regexEnding."/m", "!=", $params);
         
         $params = $this->refineParams("AND",  "/\bAND".$regexEnding."/m", " and ", $params);
+        $params = $this->refineParams("OR",  "/\bOR".$regexEnding."/m", " or ", $params);
         $json = Post::whereRaw($params)->get();
         return response()->json($json, 200);
     }
