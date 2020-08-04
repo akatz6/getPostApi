@@ -45,44 +45,55 @@ class StoreController extends Controller
 
     public function retrieveStore(Request $request)
     {
-        $regexEnding = '\s*\(.+,\s*\"?.+\"?\)';
+        $regexEnding = '\s*\([^,)]+(?:,\s*[^,)]+)+\)';
         $params = $request->query("query");
-        $params = $this->refineParams("LESS", "/LESS_THAN".$regexEnding."/m", "<", $params);
-        $params = $this->refineParams("GREATER", "/GREATER_THAN".$regexEnding."/m", ">", $params);
-        $params = $this->refineParams("EQUAL", "/EQUAL".$regexEnding."/m", "=", $params);
+        $params = $this->refineParams("LESS", "/\bLESS_THAN".$regexEnding."/m", "<", $params);
+        $params = $this->refineParams("GREATER", "/\bGREATER_THAN".$regexEnding."/m", ">", $params);
+        $params = $this->refineParams("EQUAL", "/\bEQUAL".$regexEnding."/m", "=", $params);
         
-        $params = $this->refineParams("NOT", "/NOT".$regexEnding."/m", "!=", $params);
-        $params = $this->refineParams("AND",  "/AND".$regexEnding."/m", "and", $params);
+        $params = $this->refineParams("NOT", "/\bNOT".$regexEnding."/m", "!=", $params);
+        
+        $params = $this->refineParams("AND",  "/\bAND".$regexEnding."/m", " and ", $params);
         $json = Post::whereRaw($params)->get();
         return response()->json($json, 200);
     }
 
     private function refineParams($queryParam, $regex, $symbol, $params)
     {
+       
         $fields = ["id" => 0, "title" => 0, "content" => 0, "views" => 0, "timestamp" => 0];
         preg_match_all($regex, $params, $out, PREG_PATTERN_ORDER);
-       
+    
         if(!empty($out[0])){
-            // $arr = explode($queryParam, $out[0][0]);
-            // dd($arr );
-            foreach($out as $key){
-                $str = implode($key);
+            foreach($out[0] as $key){
+                
+                $str= $key;
+                
                 $begining = strpos($str, '(') + 1;
+                
                 $end = strpos($str, ',') -  $begining;
+                
                 $firstValue = substr($str,  $begining , $end);
+                
                 $firstValue  = str_replace(' ', '', $firstValue);
+              
                 $begining = strpos($str, ',') + 1;
+                
                 $end = strpos($str, ')') -  $begining;
-               
+                
                 $endValue = substr($str,  $begining , $end);
+                
                 $endValue = str_replace(' ', '', $endValue);
                 
                 if(array_search($firstValue, $fields) > -1){
+                    
                     $params = str_replace($str, $firstValue . $symbol . $endValue, $params);
+                    
                 }
                 
             }
         }
+        // dd($params);
         return $params;
     }
 }
