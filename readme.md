@@ -1,3 +1,7 @@
+Once you clone the repo type in composer install to install all dependencies and then vendor/bin/phpunit to run the unit tests.
+If you do not have composer you will need to install it <a href="https://getcomposer.org/download/">composer</a>
+
+
 <p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
 
 <p align="center">
